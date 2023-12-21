@@ -1,0 +1,121 @@
+library(ggplot2)
+
+# This sets the maximum turns a player is allowed in a game
+max_turns <- 30
+
+# This shows/sets the players starting position on the board.
+position <- 0 
+
+# This sets the maximum number/position the player can reach on the board (The goal to reach).
+max_position <- 60 
+
+# This defines the number of sides on the die which is used for rolling.
+n_sides_die <- 6 
+
+#This starts the game loop, which runs for the specified number of turns
+for (turn in 1:max_turns){ 
+  
+  # roll the die and get a random value between 1 and 6.
+  die_roll <- sample.int(n_sides_die, 1)
+  
+  # Moving and updating a players position according to the value rolled on the die.
+  position <- position + die_roll
+  
+  # Check if the player has reached or exceeded the maximum position.
+  if ( position >= max_position ){
+    # If the player has then break the loop, which will end the game.
+    break
+  }
+}
+```
+
+1.2 Single Player Simulation
+
+```{r}
+#Setting the maximum number of turns
+max_turns <- 30
+
+#Showing the players start position
+position <- 1 
+
+#Setting the maximum position for the single player to reach.
+max_position <- 100
+
+#Defining the number of sides on the die which is used for rolling.
+n_sides_die <- 6 
+
+#Defining the number positions of snakes and ladders on the board (going up or down)
+snakes_and_ladders <- data.frame(
+  start = c(1, 4, 9, 16, 21, 36, 48, 49, 51, 56, 62, 64, 71, 80, 87, 93, 95, 98), #Start positions of the snakes and ladders.
+  end = c(38, 14, 31, 6, 42, 44, 26, 11, 67, 53, 19, 60, 91, 100, 24, 73, 75, 78) #End positions of the snakes and ladders.
+)
+
+#Loop for each turn
+for (turn in 1:max_turns){ 
+  
+  # roll the die and get a random value between 1 and 6.
+  die_roll <- sample.int(n_sides_die, 1)
+  
+  # Moving and updating a players position according to the value rolled on the die.
+  position <- position + die_roll
+  
+  #Check to see if the players position is in the dataframe (Snakes_and_ladders)
+  if (position %in% snakes_and_ladders$start) {
+    #If the players position matches the snakes or ladder, find the corresponding end position
+    position <-snakes_and_ladders$end[snakes_and_ladders$start == position]
+  }
+  
+  # Check if the player has reached or exceeded the maximum position.
+  if ( position >= max_position ){
+    # If the player has then break the loop, which will end the game.
+    break
+  }
+}
+```
+
+
+1.3 Estimation
+
+```{r}
+#Number of simulations 
+num_sim <- 10000
+
+#Storing positions reached in vector
+positions_after_10_turns <- numeric(num_sim)
+
+#Performing simulations
+for (sim in 1:num_sim) {
+  position <- 1
+  
+  #Simulating players movement for 10 turns
+  for(turn in 1:10){
+    die_roll <-sample.int(n_sides_die, 1)
+    position <- position + die_roll
+    
+    #checking if player has landed on a ladders position
+    if (position %in% snakes_and_ladders$start) {
+      position <- snakes_and_ladders$end[snakes_and_ladders$start == position]
+    }
+    
+    #Checking to see if player has reached or gone over the maximum position
+    if (position >= max_position){
+      break
+    }
+  }
+#Storing the position reached after 10 turns in this simulations
+positions_after_10_turns[sim] <- position
+}
+
+#Calculating the average position after 10 turns
+average_position_after_10_turns <- mean(positions_after_10_turns)
+
+#Calculating the variance of positions after 10 turns
+variance_after_10_turns <- var(positions_after_10_turns)
+
+#Printing the results
+cat("Average position after 10 turns:", average_position_after_10_turns)
+cat("Variance of positions after 10 turns", variance_after_10_turns)
+    
+#Histogram showing the positions reached after 10 turns
+hist(positions_after_10_turns, main = "Histogram of Positions after 10 Turns", xlab = "Position")
+```
